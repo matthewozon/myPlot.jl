@@ -3,7 +3,8 @@ module myPlot
 using PyPlot
 using Printf
 
-export imshowData, displayPSD, displayGR, displayLogData2D, displayLogData2DDownSample, imshowDataPolar
+export imshowData, displayPSD, displayGR, displayLogData2D, displayLogData2DDownSample
+export imshowDataPolar, displayCov, setVerticalColorbar
 
 
 # display in polar coordinates
@@ -165,6 +166,31 @@ function displayGR(figNum::Int64,t::Array{Cdouble,1},d::Array{Cdouble,1},GR_::Ar
     cbar.set_label("growth rate [m.s\$^{-1}\$]")
     cbar.formatter.set_powerlimits((-1,2))
     cbar.update_ticks()
+end
+
+function displayCov(figNum::Int64,r::Array{Cdouble,1},Γ::Array{Cdouble,2};_sub::Int64=111,fontsize_ticks::Int64=14)
+    min_Γ,max_Γ = extrema(Γ);
+    fig,ax,pcm = imshowData(figNum,r,r,Γ;_norm=:NoNorm,_vmin=min_Γ,_vmax=max_Γ,_edgecolors="face",_shading="None", _sub=_sub);
+    xticks(fontsize=fontsize_ticks)
+    yticks(fontsize=fontsize_ticks)
+    fig,ax,pcm
+end
+
+function setVerticalColorbar(fig::Figure,pcm::PyPlot.PyObject,x::Cdouble,y::Cdouble,dx::Cdouble,dy::Cdouble,slabel::String;fontsize_label::Int64=10,fontsize_ticks::Int64=10,color::String="white",_power_lim::Bool=true)
+    rc("ytick",color=color)
+    cax = fig.add_axes([x, y, dx, dy])
+    cb = fig.colorbar(pcm, orientation="vertical", cax=cax)
+    cb.set_label(slabel, fontsize=fontsize_label, color=color) # 
+    cb.ax.yaxis.set_tick_params(color=color)
+    cb.ax.tick_params(labelsize=fontsize_ticks)
+    cb.outline.set_edgecolor(color)
+    if _power_lim
+        cb.formatter.set_powerlimits((-1,2))
+        cb.ax.yaxis.offsetText.set_size(fontsize_ticks)
+    end
+    cb.update_ticks()
+    rc("ytick",color="black") # back to black
+    cb
 end
 
 end
