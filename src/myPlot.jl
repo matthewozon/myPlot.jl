@@ -5,7 +5,7 @@ using Printf
 
 export imshowData, displayPSD, displayGR, displayLogData2D, displayLogData2DDownSample
 export imshowDataPolar, displayCov, setVerticalColorbar
-export plot_sphere
+export plot_sphere, plot_sphere_ax, plot_cone, plot_cone_ax
 
 # display colormap on sphere using spherical coordinates
 """
@@ -19,12 +19,12 @@ export plot_sphere
     cm_heat is the colormap to be applied to code the aplitude F. The default is viridis. You can change it by setting cm_heat=PyPlot.cm.YlGnBu for instance. See PyPlot.get_cmaps() for more colormaps
 
 """
-function plot_sphere(r::Cdouble,θ::Array{Cdouble,1},φ::Array{Cdouble,1},F::Array{Cdouble,2};fig::Int64=1,r_stride::Int64=1,c_stride::Int64=1,cm_heat::ColorMap=PyPlot.cm.viridis)
+function plot_sphere(r::Cdouble,θ::Array{Cdouble,1},φ::Array{Cdouble,1},F::Array{Cdouble,2};fig::Int64=1,r_stride::Int64=1,c_stride::Int64=1,cm_heat::ColorMap=PyPlot.cm.viridis,d_offset::Tuple{Cdouble,Cdouble,Cdouble}=(0.0,0.0,0.0))
     figObj = figure(fig)
     # cartesian coordinates
-    xx = r*cos.(θ)*(sin.(φ)');
-    yy = r*sin.(θ)*(sin.(φ)');
-    zz = r*ones(Cdouble,length(θ))*(cos.(φ)');
+    xx = r*cos.(θ)*(sin.(φ)').+d_offset[1];
+    yy = r*sin.(θ)*(sin.(φ)').+d_offset[2];
+    zz = r*ones(Cdouble,length(θ))*(cos.(φ)').+d_offset[3];
     # create colormapping
     myFaceColor = cm_heat(F);
     # plot the surface
@@ -35,6 +35,62 @@ function plot_sphere(r::Cdouble,θ::Array{Cdouble,1},φ::Array{Cdouble,1},F::Arr
     zlabel("z")
     # return figure, axis and colormap
     figObj,ax,myFaceColor
+end
+
+function plot_sphere_ax(ax::PyPlot.PyObject,r::Cdouble,θ::Array{Cdouble,1},φ::Array{Cdouble,1},F::Array{Cdouble,2};r_stride::Int64=1,c_stride::Int64=1,cm_heat::ColorMap=PyPlot.cm.viridis,d_offset::Tuple{Cdouble,Cdouble,Cdouble}=(0.0,0.0,0.0))
+    sca(ax)
+    # cartesian coordinates
+    xx = r*cos.(θ)*(sin.(φ)').+d_offset[1];
+    yy = r*sin.(θ)*(sin.(φ)').+d_offset[2];
+    zz = r*ones(Cdouble,length(θ))*(cos.(φ)').+d_offset[3];
+    # create colormapping
+    myFaceColor = cm_heat(F);
+    # plot the surface
+    # ax = plot_surface(xx,yy,zz,cmap=PyPlot.cm.YlGnBu_r, facecolors=myFaceColor, cstride=c_stride, rstride=r_stride,  edgecolors="none")
+    axmp = plot_surface(xx,yy,zz,cmap=cm_heat, facecolors=myFaceColor, cstride=c_stride, rstride=r_stride,  edgecolors="none")
+    xlabel("x")
+    ylabel("y")
+    zlabel("z")
+    # return figure, axis and colormap
+    axmp,myFaceColor
+end
+
+function plot_cone(r::Array{Cdouble,1},θ::Array{Cdouble,1},φ::Cdouble,F::Array{Cdouble,2};fig::Int64=1,r_stride::Int64=1,c_stride::Int64=1,cm_heat::ColorMap=PyPlot.cm.viridis)
+    figObj = figure(fig)
+
+    # cartesian coordinates
+    xx = r*(cos.(θ)')*sin(φ);
+    yy = r*(sin.(θ)')*sin(φ);
+    zz = r*(ones(Cdouble,length(θ))')*cos(φ);
+    # create colormapping
+    myFaceColor = cm_heat(F);
+    # plot the surface
+    # ax = plot_surface(xx,yy,zz,cmap=PyPlot.cm.YlGnBu_r, facecolors=myFaceColor, cstride=c_stride, rstride=r_stride,  edgecolors="none")
+    ax = plot_surface(xx,yy,zz,cmap=cm_heat, facecolors=myFaceColor, cstride=c_stride, rstride=r_stride,  edgecolors="none")
+    xlabel("x")
+    ylabel("y")
+    zlabel("z")
+    # return figure, axis and colormap
+    figObj,ax,myFaceColor
+end
+
+function plot_cone_ax(ax::PyPlot.PyObject,r::Array{Cdouble,1},θ::Array{Cdouble,1},φ::Cdouble,F::Array{Cdouble,2};fig::Int64=1,r_stride::Int64=1,c_stride::Int64=1,cm_heat::ColorMap=PyPlot.cm.viridis)
+    sca(ax)
+
+    # cartesian coordinates
+    xx = r*(cos.(θ)')*sin(φ);
+    yy = r*(sin.(θ)')*sin(φ);
+    zz = r*(ones(Cdouble,length(θ))')*cos(φ);
+    # create colormapping
+    myFaceColor = cm_heat(F);
+    # plot the surface
+    # ax = plot_surface(xx,yy,zz,cmap=PyPlot.cm.YlGnBu_r, facecolors=myFaceColor, cstride=c_stride, rstride=r_stride,  edgecolors="none")
+    axmp = plot_surface(xx,yy,zz,cmap=cm_heat, facecolors=myFaceColor, cstride=c_stride, rstride=r_stride,  edgecolors="none")
+    xlabel("x")
+    ylabel("y")
+    zlabel("z")
+    # return figure, axis and colormap
+    axmp,myFaceColor
 end
 
 
