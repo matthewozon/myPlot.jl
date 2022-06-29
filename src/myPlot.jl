@@ -5,6 +5,37 @@ using Printf
 
 export imshowData, displayPSD, displayGR, displayLogData2D, displayLogData2DDownSample
 export imshowDataPolar, displayCov, setVerticalColorbar
+export plot_sphere
+
+# display colormap on sphere using spherical coordinates
+"""
+    fig,ax,color_code = plot_sphere(r::Cdouble,θ::Array{Cdouble,1},φ::Array{Cdouble,1},F::Array{Cdouble,2};fig::Int64=1,r_stride::Int64=1,c_stride::Int64=1,cm_heat::ColorMap=PyPlot.cm.viridis)
+
+    r: radius of the sphere (radius in [0,R])
+    θ: azimuthal angle (longitude in [0,2π))
+    φ: polar angle (latitude in [0,π])
+    F: scalar amplitude (F(θ,φ) in [0,1])
+
+    cm_heat is the colormap to be applied to code the aplitude F. The default is viridis. You can change it by setting cm_heat=PyPlot.cm.YlGnBu for instance. See PyPlot.get_cmaps() for more colormaps
+
+"""
+function plot_sphere(r::Cdouble,θ::Array{Cdouble,1},φ::Array{Cdouble,1},F::Array{Cdouble,2};fig::Int64=1,r_stride::Int64=1,c_stride::Int64=1,cm_heat::ColorMap=PyPlot.cm.viridis)
+    figObj = figure(fig)
+    # cartesian coordinates
+    xx = r*cos.(θ)*(sin.(φ)');
+    yy = r*sin.(θ)*(sin.(φ)');
+    zz = r*ones(Cdouble,length(θ))*(cos.(φ)');
+    # create colormapping
+    myFaceColor = cm_heat(F);
+    # plot the surface
+    # ax = plot_surface(xx,yy,zz,cmap=PyPlot.cm.YlGnBu_r, facecolors=myFaceColor, cstride=c_stride, rstride=r_stride,  edgecolors="none")
+    ax = plot_surface(xx,yy,zz,cmap=cm_heat, facecolors=myFaceColor, cstride=c_stride, rstride=r_stride,  edgecolors="none")
+    xlabel("x")
+    ylabel("y")
+    zlabel("z")
+    # return figure, axis and colormap
+    figObj,ax,myFaceColor
+end
 
 
 # display in polar coordinates
