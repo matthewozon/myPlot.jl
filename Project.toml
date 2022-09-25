@@ -1,0 +1,11 @@
+name = "myPlot"
+uuid = "ac82fe17-a761-4aa2-921b-90150c0902bf"
+version = "0.0.0"
+
+[deps]
+PyPlot = "d330b81b-6aea-500a-939a-2ce795aea3ee"
+Printf = "de0858da-6303-5e67-8744-51eddeeeb8d7"
+
+[compat]
+julia = "1"
+
