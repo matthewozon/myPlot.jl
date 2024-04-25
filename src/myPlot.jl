@@ -112,13 +112,16 @@ end
 
 
 # display data on the actual grid (taking into account the pixel coordinates)
-function imshowData(figNum::Int64,_t::Array{Cdouble,1},_h::Array{Cdouble,1},Z::Array{Cdouble,2};_norm=:NoNorm,_vmin=0.0,_vmax=1.0,_edgecolors="face",_shading="None", _sub=111)
+function imshowData(figNum::Int64,_t::Array{Cdouble,1},_h::Array{Cdouble,1},Z::Array{Cdouble,2};_norm=:NoNorm,_vmin=0.0,_vmax=1.0,_edgecolors="face",_shading="None", _sub::Union{Int64,Tuple{Int64,Int64,Int64}}=111)
     # get the focus on the figure or create a figure
     fig=figure(figNum)
 
     # get the current axis
-    ax=subplot(_sub)
-
+    if (typeof(_sub)==Int64)
+        ax=subplot(_sub)
+    else
+        ax=subplot(_sub[1],_sub[2],_sub[3])
+    end
 
     # display image if possible
     if (length(_h),length(_t))==size(Z)
