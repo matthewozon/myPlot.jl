@@ -1,6 +1,6 @@
 name = "myPlot"
 uuid = "ac82fe17-a761-4aa2-921b-90150c0902bf"
-version = "0.0.0"
+version = "0.0.1"
 
 [deps]
 PyPlot = "d330b81b-6aea-500a-939a-2ce795aea3ee"
